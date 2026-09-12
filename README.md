@@ -47,8 +47,8 @@ Fill in `.env.local`:
 | `META_APP_SECRET` | Meta App → Settings → Basic. Optional locally, **required in production** |
 | `NEXT_PUBLIC_SUPABASE_URL` / `ANON_KEY` | Supabase → Project Settings → API |
 | `SUPABASE_SERVICE_ROLE_KEY` | Same page. Server-only — never ships to the browser |
-| `ANTHROPIC_API_KEY` | console.anthropic.com → API keys |
-| `ANTHROPIC_MODEL` | `claude-opus-5` (default), `claude-sonnet-5`, or `claude-haiku-4-5` |
+| `OPENROUTER_API_KEY` | openrouter.ai → Keys |
+| `OPENROUTER_MODEL` | Any slug from openrouter.ai/models (add `:free` for free models) |
 
 ### 4. Run
 
@@ -102,11 +102,9 @@ agent-run chat without flipping it over first.
 - **Non-text messages.** Images, voice notes and documents are recorded as a
   short placeholder (`[the user sent an image]`) so the thread stays coherent.
   Media is not downloaded or transcribed.
-- **AI settings.** Requests run at `effort: "low"` � a customer-service chat is
-  latency-sensitive and not a reasoning task, so low effort keeps replies fast
-  and cheap. Server-side refusal fallbacks are enabled, so a declined request
-  is retried on a fallback model rather than leaving the customer with no
-  reply; if the whole chain declines, a polite hand-off line is sent instead.
+- **Upstream AI errors.** OpenRouter reports provider failures (a rate-limited
+  free model, for instance) inside a 200 response body rather than as an HTTP
+  error, so the reply path checks for that before reading `choices`.
 
 ## Security
 
