@@ -28,8 +28,18 @@ create index if not exists idx_messages_conversation on messages(conversation_id
 create index if not exists idx_conversations_updated on conversations(updated_at desc);
 
 -- Realtime: the dashboard subscribes to INSERT/UPDATE on both tables.
-alter publication supabase_realtime add table messages;
-alter publication supabase_realtime add table conversations;
+-- Wrapped so re-running the migration is a no-op instead of an error.
+do $$
+begin
+  alter publication supabase_realtime add table messages;
+exception when duplicate_object then null;
+end $$;
+
+do $$
+begin
+  alter publication supabase_realtime add table conversations;
+exception when duplicate_object then null;
+end $$;
 
 -- Row Level Security.
 --   * Every WRITE goes through this app's API routes, which use the
